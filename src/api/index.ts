@@ -30,7 +30,7 @@ const searchPerson = async (name: string): Promise<Array<Person>> => {
     const data: { results: Array<Person> } = await response.json();
     return data.results;
   } catch (error) {
-    console.error("Error fetching all persons:", error);
+    console.error("Error fetching search persons:", error);
     throw error;
   }
 };

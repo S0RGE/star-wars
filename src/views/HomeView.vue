@@ -1,5 +1,5 @@
 <template>
-  <div class="home">
+  <div v-if="starWarsPersons.length" class="home container">
     <h1 class="text-center">Star wars Persons</h1>
     <div>
       <div class="form-control w-full max-w-xs home__search">
@@ -32,6 +32,9 @@
     <div v-if="starWarsPersons.length">
       <persons-table :starWarsPersons="starWarsPersons" />
     </div>
+  </div>
+  <div v-else class="loader">
+    <span class="loading loading-dots loading-lg"></span>
   </div>
 </template>
 
@@ -70,15 +73,6 @@ watch(search, async () => {
 
 <style lang="scss">
 .home {
-  max-width: 1200px;
-  margin: 0 auto;
-
-  h1 {
-    text-align: center;
-    text-transform: uppercase;
-    font-weight: bold;
-  }
-
   input {
     @apply input input-bordered;
     margin: 1em auto;

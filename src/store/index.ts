@@ -16,6 +16,11 @@ export default createStore({
     getFavourites(state) {
       return state.favourites;
     },
+    isPersonInFavourites(state) {
+      return (person: Person) => {
+        return state.favourites.some((p) => p.name === person.name);
+      };
+    },
   },
   mutations: {
     setStarWarPersons(state, payload: Array<Person>) {
@@ -41,7 +46,6 @@ export default createStore({
   },
   actions: {
     setStarWarPersons({ commit }, persons: Array<Person>) {
-      console.log("setStarWarPersons", persons);
       commit("setStarWarPersons", persons);
     },
     addPersonToFavourites({ commit }, person: Person) {

@@ -41,7 +41,7 @@
           <th>
             <button
               v-if="!isFavourite"
-              class="btn btn-success btn-xs mr-2"
+              class="btn btn-success btn-xs"
               @click.stop="addPersonToFavourites(person)"
             >
               Add
@@ -96,4 +96,8 @@ const addPersonToFavourites = (person: Person) => {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+button {
+  margin: 0 0.3em 0 0.3em;
+}
+</style>

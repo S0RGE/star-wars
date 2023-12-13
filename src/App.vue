@@ -21,6 +21,25 @@ onMounted(async () => {
   @aplly bg-primary-content;
 }
 
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+h1 {
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: bold;
+  margin-bottom: 2em;
+}
+
+.loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 90vh;
+}
+
 nav {
   padding: 30px;
   text-align: center;

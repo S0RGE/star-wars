@@ -1,5 +1,5 @@
 <template>
-  <div class="about">
+  <div class="about container">
     <h1>This is an Favourites page</h1>
     <persons-table :starWarsPersons="starWarsFavouritesPersons" />
   </div>
@@ -16,16 +16,3 @@ const starWarsFavouritesPersons = computed(() => {
   return store.getters.getFavourites;
 });
 </script>
-
-<style lang="scss">
-.about {
-  max-width: 1200px;
-  margin: 0 auto;
-  h1 {
-    text-align: center;
-    text-transform: uppercase;
-    font-weight: bold;
-    margin-bottom: 2em;
-  }
-}
-</style>
