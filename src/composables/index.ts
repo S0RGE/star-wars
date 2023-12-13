@@ -5,8 +5,12 @@ import { fetchAllPersons } from "@/api";
 
 const getAllPersons = async (): Promise<void> => {
   const store = useStore();
-  const starWarsPersons = await fetchAllPersons();
-  store.dispatch("setStarWarPersons", starWarsPersons);
+  try {
+    const starWarsPersons = await fetchAllPersons();
+    store.dispatch("setStarWarPersons", starWarsPersons);
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 const getFavouritesFromLocalStorage = (): void => {

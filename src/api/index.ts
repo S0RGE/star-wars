@@ -9,7 +9,6 @@ const fetchAllPersons = async <T>(url?: string): Promise<T> => {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error("Error fetching all persons:", error);
     throw new Error("Failed to fetch all persons.");
   }
 };
@@ -20,8 +19,7 @@ const fetchPerson = async (id: string): Promise<Person> => {
     const data: Person = await response.json();
     return data;
   } catch (error) {
-    console.error("Error fetching all persons:", error);
-    throw error;
+    throw new Error("Failed to fetch person.");
   }
 };
 
@@ -31,8 +29,7 @@ const searchPerson = async (name: string): Promise<Array<Person>> => {
     const data: { results: Array<Person> } = await response.json();
     return data.results;
   } catch (error) {
-    console.error("Error fetching search persons:", error);
-    throw error;
+    throw new Error("Failed to search person.");
   }
 };
 

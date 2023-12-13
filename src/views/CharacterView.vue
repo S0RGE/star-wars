@@ -1,8 +1,11 @@
 <template>
   <div class="person-page">
     <h1>Person page</h1>
-    <div class="hero min-h-screen bg-base-200" v-if="currentPerson">
-      <div class="hero-content text-center">
+    <div class="hero min-h-screen bg-base-200" v-if="!isLoading">
+      <div
+        class="hero-content text-center"
+        v-if="!fetchingError && currentPerson"
+      >
         <div class="max-w-md">
           <h1 class="text-5xl font-bold text-center">
             {{ currentPerson?.name }}
@@ -28,6 +31,17 @@
           </div>
         </div>
       </div>
+      <div v-else class="person-page__error">
+        <h3>
+          Something went wrong, try again
+          <button
+            @click="getCurrentPerson"
+            class="btn btn-sm btn-outline btn-primary"
+          >
+            Retry
+          </button>
+        </h3>
+      </div>
     </div>
     <div v-else class="loader">
       <span class="loading loading-dots loading-lg"></span>
@@ -48,6 +62,7 @@ import { fetchPerson } from "@/api";
 import { Person } from "@/types";
 
 const currentPerson = ref<Person>();
+const isLoading = ref<boolean>(false);
 
 const isFavourite = computed(() => {
   return store.getters.isPersonInFavourites(currentPerson.value);
@@ -61,9 +76,23 @@ const addPersonToFavourites = (person: Person) => {
   store.dispatch("addPersonToFavourites", person);
 };
 
-onMounted(async () => {
+const fetchingError = ref<string>("");
+
+const getCurrentPerson = async () => {
+  isLoading.value = true;
+  fetchingError.value = "";
   const id = route.params.id as string;
-  currentPerson.value = await fetchPerson(id);
+  try {
+    currentPerson.value = await fetchPerson(id);
+  } catch (error) {
+    fetchingError.value = error as string;
+    console.error(error);
+  }
+  isLoading.value = false;
+};
+
+onMounted(async () => {
+  await getCurrentPerson();
 });
 </script>
 
@@ -71,6 +100,11 @@ onMounted(async () => {
 .person-page {
   &__actions {
     margin: 2em 0 2em 0;
+  }
+
+  &__error {
+    @apply mt-4;
+    text-align: center;
   }
 }
 </style>

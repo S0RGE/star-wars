@@ -1,7 +1,7 @@
 <template>
   <div class="home container">
-    <h1 class="text-center">Star wars Persons</h1>
-    <div class="home-content">
+    <h1>Star wars Persons</h1>
+    <div class="home-content" v-if="!fetchingError">
       <div>
         <div class="form-control w-full max-w-xs home__search">
           <input
@@ -49,30 +49,45 @@
         <span class="loading loading-dots loading-lg"></span>
       </div>
     </div>
+    <div v-else class="home__error">
+      <h3>
+        Something went wrong, try again
+        <button
+          @click="getAllPersons"
+          class="btn btn-sm btn-outline btn-primary"
+        >
+          Retry
+        </button>
+      </h3>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { watch, ref, onMounted } from "vue";
-import { searchPerson, fetchAllPersons } from "@/api";
 import PersonsTable from "@/components/PersonsTable.vue";
+import { searchPerson, fetchAllPersons } from "@/api";
 import { getPersonId } from "@/helpers/parsing";
 
 import type { Result, Person } from "@/types";
 
 const isLoading = ref<boolean>(false);
+const fetchingError = ref<string>("");
 
 const starWarsPersons = ref<Array<Person>>([]);
 
-const search = ref<string>("");
-const searchPersonResult = ref<Array<Person>>([]);
-
 const getAllPersons = async (): Promise<void> => {
   isLoading.value = true;
-  const result: Result<Person> = await fetchAllPersons();
-  starWarsPersons.value = result.results as Array<Person>;
-  nextPage.value = result.next;
-  previousPage.value = result.previous;
+  fetchingError.value = "";
+  try {
+    const result: Result<Person> = await fetchAllPersons();
+    starWarsPersons.value = result.results as Array<Person>;
+    nextPage.value = result.next;
+    previousPage.value = result.previous;
+  } catch (error) {
+    fetchingError.value = error as string;
+    console.error(error);
+  }
   isLoading.value = false;
 };
 
@@ -85,10 +100,15 @@ const fetchNextPage = async (): Promise<void> => {
     return;
   }
   isLoading.value = true;
-  const result: Result<Person> = await fetchAllPersons(nextPage.value);
-  starWarsPersons.value = result.results;
-  nextPage.value = result.next;
-  previousPage.value = result.previous;
+  try {
+    const result: Result<Person> = await fetchAllPersons(nextPage.value);
+    starWarsPersons.value = result.results;
+    nextPage.value = result.next;
+    previousPage.value = result.previous;
+  } catch (error) {
+    fetchingError.value = error as string;
+    console.error(error);
+  }
   isLoading.value = false;
 };
 
@@ -97,14 +117,22 @@ const fetchPreviousPage = async (): Promise<void> => {
     return;
   }
   isLoading.value = true;
-  const result: Result<Person> = await fetchAllPersons(previousPage.value);
-  starWarsPersons.value = result.results;
-  nextPage.value = result.next;
-  previousPage.value = result.previous;
+  try {
+    const result: Result<Person> = await fetchAllPersons(previousPage.value);
+    starWarsPersons.value = result.results;
+    nextPage.value = result.next;
+    previousPage.value = result.previous;
+  } catch (error) {
+    fetchingError.value = error as string;
+    console.error(error);
+  }
   isLoading.value = false;
 };
 
 // Searching person by name
+const search = ref<string>("");
+const searchPersonResult = ref<Array<Person>>([]);
+
 let debounceValue: number | undefined;
 
 watch(search, async () => {
@@ -114,8 +142,13 @@ watch(search, async () => {
 
   clearTimeout(debounceValue);
   debounceValue = setTimeout(async () => {
-    const findedPersons = await searchPerson(search.value);
-    searchPersonResult.value = findedPersons;
+    try {
+      const findedPersons = await searchPerson(search.value);
+      searchPersonResult.value = findedPersons;
+    } catch (error) {
+      fetchingError.value = error as string;
+      console.error(error);
+    }
   }, 500);
 });
 
@@ -155,6 +188,11 @@ onMounted(async () => {
 
   .table-pagination {
     @apply flex justify-center items-center mt-3;
+  }
+
+  &__error {
+    @apply mt-4;
+    text-align: center;
   }
 }
 </style>
