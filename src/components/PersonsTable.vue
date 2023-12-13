@@ -40,6 +40,7 @@
           </td>
           <th>
             <button
+              v-if="!isFavourite"
               class="btn btn-success btn-xs mr-2"
               @click.stop="addPersonToFavourites(person)"
             >
@@ -68,7 +69,8 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps } from "vue";
+import { defineProps, computed } from "vue";
+import { useRoute } from "vue-router";
 import type { Person } from "@/types";
 
 import { getPersonId } from "@/helpers/parsing";
@@ -79,6 +81,11 @@ defineProps<{
 
 import { useStore } from "vuex";
 const store = useStore();
+
+const route = useRoute();
+const isFavourite = computed(() => {
+  return route.name === "favourites";
+});
 
 const deletePersonFromFavourites = (person: Person) => {
   store.dispatch("deletePersonFromFavourites", person);

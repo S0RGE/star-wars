@@ -70,7 +70,8 @@ watch(search, async () => {
 
 <style lang="scss">
 .home {
-  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
 
   h1 {
     text-align: center;

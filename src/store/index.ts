@@ -35,6 +35,9 @@ export default createStore({
       localStorage.setItem("favourites", JSON.stringify(favourites));
       state.favourites = favourites;
     },
+    setFavourites(state, payload: Array<Person>) {
+      state.favourites = payload;
+    },
   },
   actions: {
     setStarWarPersons({ commit }, persons: Array<Person>) {
@@ -46,6 +49,9 @@ export default createStore({
     },
     deletePersonFromFavourites({ commit }, person: Person) {
       commit("deletePersonFromFavourites", person);
+    },
+    setFavourites({ commit }, favourites: Array<Person>) {
+      commit("setFavourites", favourites);
     },
   },
   modules: {},

@@ -8,9 +8,10 @@
 
 <script setup lang="ts">
 import { onMounted } from "vue";
-import { getAllPersons } from "./composables";
+import { getAllPersons, getFavouritesFromLocalStorage } from "./composables";
 
 onMounted(async () => {
+  getFavouritesFromLocalStorage();
   await getAllPersons();
 });
 </script>
@@ -22,6 +23,7 @@ onMounted(async () => {
 
 nav {
   padding: 30px;
+  text-align: center;
 
   a {
     font-weight: bold;
