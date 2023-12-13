@@ -11,8 +11,8 @@
     </div>
     <div v-if="starWarsPersons.length">
       <div v-for="person in starWarsPersons" :key="person.name">
-        <span> {{ person.name }} </span> | <span> {{ person.height }} </span> |
-        <span> {{ person.mass }} </span> |
+        <span @click="logPersonId(person)"> {{ person.name }} </span> |
+        <span> {{ person.height }} </span> | <span> {{ person.mass }} </span> |
         <span> {{ person.hairColor }} </span> |
         <button @click="deletePersonFromFavourites(person)">Delete</button>
         <button @click="addPersonToFavourites(person)">Tofavourites</button>
@@ -24,9 +24,13 @@
 <script lang="ts" setup>
 import { computed, watch, ref } from "vue";
 import { searchPerson } from "@/api";
+import { getPersonId } from "@/helpers/parsing";
 
 import { useStore } from "vuex";
 const store = useStore();
+
+import { useRouter } from "vue-router";
+const router = useRouter();
 
 import type { Person } from "@/types";
 
@@ -45,6 +49,16 @@ const deletePersonFromFavourites = (person: Person) => {
 
 const addPersonToFavourites = (person: Person) => {
   store.dispatch("addPersonToFavourites", person);
+};
+
+const logPersonId = (person: Person) => {
+  router.push({
+    name: "character",
+    params: {
+      id: getPersonId(person.url),
+    },
+  });
+  console.log(getPersonId(person.url));
 };
 
 watch(search, async () => {

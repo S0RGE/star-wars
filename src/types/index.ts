@@ -7,6 +7,7 @@ type Person = {
   eyeColor: string;
   birthYear: string;
   gender: string;
+  url: string;
 };
 
 export type { Person };

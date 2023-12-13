@@ -13,6 +13,17 @@ const fetchAllPersons = async (): Promise<Array<Person>> => {
   }
 };
 
+const fetchPerson = async (id: string): Promise<Person> => {
+  try {
+    const response = await fetch(`${API_URL}/people/${id}`);
+    const data: Person = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching all persons:", error);
+    throw error;
+  }
+};
+
 const searchPerson = async (name: string): Promise<Array<Person>> => {
   try {
     const response = await fetch(`${API_URL}/people/?search=${name}`);
@@ -24,4 +35,4 @@ const searchPerson = async (name: string): Promise<Array<Person>> => {
   }
 };
 
-export { fetchAllPersons, searchPerson };
+export { fetchAllPersons, searchPerson, fetchPerson };
