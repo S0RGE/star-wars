@@ -63,10 +63,17 @@
       </h3>
     </div>
   </div>
+  <button
+    @click="scrollToTop"
+    v-if="showTopButton"
+    class="btn btn-active btn-accent top-button"
+  >
+    To top
+  </button>
 </template>
 
 <script lang="ts" setup>
-import { watch, ref, onMounted, computed } from "vue";
+import { watch, ref, onMounted, computed, onUnmounted } from "vue";
 import PersonsTable from "@/components/PersonsTable.vue";
 import { searchPerson, fetchAllPersons } from "@/api";
 import { getPersonId } from "@/helpers/parsing";
@@ -84,11 +91,14 @@ const starWarsPersons = computed(() => {
 });
 
 const getAllPersons = async (): Promise<void> => {
-  isLoading.value = true;
   fetchingError.value = "";
+  if (starWarsPersons.value.length) {
+    return;
+  }
+  isLoading.value = true;
   try {
     const response: Result<Person> = await fetchAllPersons();
-    store.dispatch("addtStarWarPersons", response.results as Array<Person>);
+    store.dispatch("addStarWarPersons", response.results as Array<Person>);
     nextPage.value = response.next;
   } catch (error) {
     fetchingError.value = error as string;
@@ -107,7 +117,7 @@ const fetchNextPage = async (): Promise<void> => {
   isPageLoading.value = true;
   try {
     const response: Result<Person> = await fetchAllPersons(nextPage.value);
-    store.dispatch("addtStarWarPersons", response.results as Array<Person>);
+    store.dispatch("addStarWarPersons", response.results as Array<Person>);
     nextPage.value = response.next;
   } catch (error) {
     fetchingError.value = error as string;
@@ -139,12 +149,30 @@ watch(search, async () => {
   }, 500);
 });
 
+// Scroll to top
+const showTopButton = ref<boolean>(false);
+const handleScroll = () => {
+  showTopButton.value = window.scrollY > 400;
+};
+
+const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
+};
+
 onMounted(async () => {
   await getAllPersons();
+  window.addEventListener("scroll", handleScroll);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("scroll", handleScroll);
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .home {
   input {
     @apply input input-bordered;
@@ -181,5 +209,10 @@ onMounted(async () => {
     @apply mt-4;
     text-align: center;
   }
+}
+.top-button {
+  position: fixed;
+  right: 1em;
+  bottom: 1em;
 }
 </style>

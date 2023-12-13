@@ -8,10 +8,10 @@
 
 <script setup lang="ts">
 import { onMounted } from "vue";
-import { getFavouritesFromLocalStorage } from "@/composables";
+import { useGetFavouritesFromLocalStorage } from "@/composables";
 
 onMounted(async () => {
-  getFavouritesFromLocalStorage();
+  useGetFavouritesFromLocalStorage();
 });
 </script>
 
@@ -25,11 +25,12 @@ onMounted(async () => {
   margin: 0 auto;
 }
 
-h1 {
+h1,
+h2 {
   text-align: center;
   text-transform: uppercase;
   font-weight: bold;
-  margin-bottom: 2em;
+  margin: 2em 0 2em 0;
 }
 
 .loader {

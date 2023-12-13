@@ -1,19 +1,7 @@
 import { useStore } from "vuex";
 import type { Person } from "@/types";
 
-import { fetchAllPersons } from "@/api";
-
-const getAllPersons = async (): Promise<void> => {
-  const store = useStore();
-  try {
-    const starWarsPersons = await fetchAllPersons();
-    store.dispatch("setStarWarPersons", starWarsPersons);
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-const getFavouritesFromLocalStorage = (): void => {
+const useGetFavouritesFromLocalStorage = (): void => {
   const store = useStore();
   const favourites = localStorage.getItem("favourites");
   let favouritesArray: Array<Person> = [];
@@ -23,4 +11,4 @@ const getFavouritesFromLocalStorage = (): void => {
   }
 };
 
-export { getAllPersons, getFavouritesFromLocalStorage };
+export { useGetFavouritesFromLocalStorage };

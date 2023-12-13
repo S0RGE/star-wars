@@ -96,10 +96,10 @@ onMounted(async () => {
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .person-page {
   &__actions {
-    margin: 2em 0 2em 0;
+    margin-top: 1em;
   }
 
   &__error {

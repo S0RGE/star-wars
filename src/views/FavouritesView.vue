@@ -1,7 +1,13 @@
 <template>
   <div class="about container">
     <h1>This is an Favourites page</h1>
-    <persons-table :starWarsPersons="starWarsFavouritesPersons" />
+    <persons-table
+      :starWarsPersons="starWarsFavouritesPersons"
+      v-if="starWarsFavouritesPersons.length"
+    />
+    <div v-else>
+      <h2>No Favourites</h2>
+    </div>
   </div>
 </template>
 
