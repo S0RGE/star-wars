@@ -2,14 +2,15 @@ const API_URL = "https://swapi.dev/api";
 
 import { Person } from "../types/index";
 
-const fetchAllPersons = async (): Promise<Array<Person>> => {
+const fetchAllPersons = async <T>(url?: string): Promise<T> => {
   try {
-    const response: Response = await fetch(`${API_URL}/people/`);
-    const data: { results: Array<Person> } = await response.json();
-    return data.results;
+    const fetchUrl = url || `${API_URL}/people`;
+    const response: Response = await fetch(fetchUrl);
+    const data = await response.json();
+    return data;
   } catch (error) {
     console.error("Error fetching all persons:", error);
-    throw error;
+    throw new Error("Failed to fetch all persons.");
   }
 };
 

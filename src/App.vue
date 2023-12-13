@@ -8,11 +8,10 @@
 
 <script setup lang="ts">
 import { onMounted } from "vue";
-import { getAllPersons, getFavouritesFromLocalStorage } from "./composables";
+import { getFavouritesFromLocalStorage } from "@/composables";
 
 onMounted(async () => {
   getFavouritesFromLocalStorage();
-  await getAllPersons();
 });
 </script>
 

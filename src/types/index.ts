@@ -10,4 +10,10 @@ type Person = {
   url: string;
 };
 
-export type { Person };
+type Result<T> = {
+  results: T[];
+  next: string | null;
+  previous: string | null;
+};
+
+export type { Person, Result };

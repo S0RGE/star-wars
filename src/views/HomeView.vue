@@ -1,61 +1,110 @@
 <template>
-  <div v-if="starWarsPersons.length" class="home container">
+  <div class="home container">
     <h1 class="text-center">Star wars Persons</h1>
-    <div>
-      <div class="form-control w-full max-w-xs home__search">
-        <input
-          type="text"
-          placeholder="Type character name"
-          class="input w-full max-w-xs"
-          v-model="search"
-        />
-        <div class="home__search-result" v-if="searchPersonResult.length">
-          <ul class="p-2 shadow menu rounded-box w-52">
-            <li
-              v-for="person in searchPersonResult"
-              :key="person.name"
-              class="p-2"
+    <div class="home-content">
+      <div>
+        <div class="form-control w-full max-w-xs home__search">
+          <input
+            type="text"
+            placeholder="Type character name"
+            class="input w-full max-w-xs"
+            v-model="search"
+          />
+          <div class="home__search-result" v-if="search.length >= 3">
+            <ul
+              class="p-2 shadow menu rounded-box w-52"
+              v-if="searchPersonResult.length"
             >
-              <router-link
-                :to="{
-                  name: 'character',
-                  params: { id: getPersonId(person.url) },
-                }"
-                >{{ person.name }}</router-link
+              <li
+                v-for="person in searchPersonResult"
+                :key="person.name"
+                class="p-2"
               >
-            </li>
-          </ul>
+                <router-link
+                  :to="{
+                    name: 'character',
+                    params: { id: getPersonId(person.url) },
+                  }"
+                  >{{ person.name }}</router-link
+                >
+              </li>
+            </ul>
+            <span v-else class="loading loading-spinner loading-sm"></span>
+          </div>
+        </div>
+        <div class="divider"></div>
+      </div>
+      <div v-if="!isLoading">
+        <persons-table :starWarsPersons="starWarsPersons" />
+        <div class="join table-pagination">
+          <button class="join-item btn btn-outline" @click="fetchPreviousPage">
+            Previous page
+          </button>
+          <button class="join-item btn btn-outline" @click="fetchNextPage">
+            Next
+          </button>
         </div>
       </div>
-      <div class="divider"></div>
+      <div v-else class="loader">
+        <span class="loading loading-dots loading-lg"></span>
+      </div>
     </div>
-    <div v-if="starWarsPersons.length">
-      <persons-table :starWarsPersons="starWarsPersons" />
-    </div>
-  </div>
-  <div v-else class="loader">
-    <span class="loading loading-dots loading-lg"></span>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, watch, ref } from "vue";
-import { searchPerson } from "@/api";
+import { watch, ref, onMounted } from "vue";
+import { searchPerson, fetchAllPersons } from "@/api";
 import PersonsTable from "@/components/PersonsTable.vue";
 import { getPersonId } from "@/helpers/parsing";
 
-import { useStore } from "vuex";
-const store = useStore();
+import type { Result, Person } from "@/types";
 
-import type { Person } from "@/types";
+const isLoading = ref<boolean>(false);
 
-const starWarsPersons = computed(() => {
-  return store.getters.getStarWarPersons;
-});
+const starWarsPersons = ref<Array<Person>>([]);
 
 const search = ref<string>("");
 const searchPersonResult = ref<Array<Person>>([]);
 
+const getAllPersons = async (): Promise<void> => {
+  isLoading.value = true;
+  const result: Result<Person> = await fetchAllPersons();
+  starWarsPersons.value = result.results as Array<Person>;
+  nextPage.value = result.next;
+  previousPage.value = result.previous;
+  isLoading.value = false;
+};
+
+// Pagination
+const nextPage = ref<string | null>(null);
+const previousPage = ref<string | null>(null);
+
+const fetchNextPage = async (): Promise<void> => {
+  if (!nextPage.value) {
+    return;
+  }
+  isLoading.value = true;
+  const result: Result<Person> = await fetchAllPersons(nextPage.value);
+  starWarsPersons.value = result.results;
+  nextPage.value = result.next;
+  previousPage.value = result.previous;
+  isLoading.value = false;
+};
+
+const fetchPreviousPage = async (): Promise<void> => {
+  if (!previousPage.value) {
+    return;
+  }
+  isLoading.value = true;
+  const result: Result<Person> = await fetchAllPersons(previousPage.value);
+  starWarsPersons.value = result.results;
+  nextPage.value = result.next;
+  previousPage.value = result.previous;
+  isLoading.value = false;
+};
+
+// Searching person by name
 let debounceValue: number | undefined;
 
 watch(search, async () => {
@@ -68,6 +117,10 @@ watch(search, async () => {
     const findedPersons = await searchPerson(search.value);
     searchPersonResult.value = findedPersons;
   }, 500);
+});
+
+onMounted(async () => {
+  await getAllPersons();
 });
 </script>
 
@@ -93,6 +146,15 @@ watch(search, async () => {
     ul {
       background-color: #f1f0f0 !important;
     }
+
+    span {
+      display: block;
+      margin: 1em auto;
+    }
+  }
+
+  .table-pagination {
+    @apply flex justify-center items-center mt-3;
   }
 }
 </style>
