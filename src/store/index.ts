@@ -23,8 +23,10 @@ export default createStore({
     },
   },
   mutations: {
-    setStarWarPersons(state, payload: Array<Person>) {
-      state.starWarPersons = payload;
+    addtStarWarPersons(state, payload: Array<Person>) {
+      state.starWarPersons = Array.from(
+        new Set([...state.starWarPersons, ...payload])
+      ) as Array<Person>;
     },
     addPersonToFavourites(state, payload: Person) {
       localStorage.setItem(
@@ -45,8 +47,8 @@ export default createStore({
     },
   },
   actions: {
-    setStarWarPersons({ commit }, persons: Array<Person>) {
-      commit("setStarWarPersons", persons);
+    addtStarWarPersons({ commit }, persons: Array<Person>) {
+      commit("addtStarWarPersons", persons);
     },
     addPersonToFavourites({ commit }, person: Person) {
       commit("addPersonToFavourites", person);

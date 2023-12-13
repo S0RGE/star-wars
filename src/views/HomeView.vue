@@ -34,14 +34,16 @@
         </div>
         <div class="divider"></div>
       </div>
-      <div v-if="!isLoading">
+      <div v-if="!isLoading || starWarsPersons.length">
         <persons-table :starWarsPersons="starWarsPersons" />
         <div class="join table-pagination">
-          <button class="join-item btn btn-outline" @click="fetchPreviousPage">
-            Previous page
-          </button>
-          <button class="join-item btn btn-outline" @click="fetchNextPage">
-            Next
+          <button
+            class="btn btn-outline"
+            :class="{ 'loading loading-spinner': isPageLoading }"
+            @click="fetchNextPage"
+            :disabled="!nextPage"
+          >
+            More
           </button>
         </div>
       </div>
@@ -64,26 +66,30 @@
 </template>
 
 <script lang="ts" setup>
-import { watch, ref, onMounted } from "vue";
+import { watch, ref, onMounted, computed } from "vue";
 import PersonsTable from "@/components/PersonsTable.vue";
 import { searchPerson, fetchAllPersons } from "@/api";
 import { getPersonId } from "@/helpers/parsing";
-
+import { useStore } from "vuex";
 import type { Result, Person } from "@/types";
 
+const store = useStore();
+
 const isLoading = ref<boolean>(false);
+const isPageLoading = ref<boolean>(false);
 const fetchingError = ref<string>("");
 
-const starWarsPersons = ref<Array<Person>>([]);
+const starWarsPersons = computed(() => {
+  return store.getters.getStarWarPersons;
+});
 
 const getAllPersons = async (): Promise<void> => {
   isLoading.value = true;
   fetchingError.value = "";
   try {
-    const result: Result<Person> = await fetchAllPersons();
-    starWarsPersons.value = result.results as Array<Person>;
-    nextPage.value = result.next;
-    previousPage.value = result.previous;
+    const response: Result<Person> = await fetchAllPersons();
+    store.dispatch("addtStarWarPersons", response.results as Array<Person>);
+    nextPage.value = response.next;
   } catch (error) {
     fetchingError.value = error as string;
     console.error(error);
@@ -93,40 +99,21 @@ const getAllPersons = async (): Promise<void> => {
 
 // Pagination
 const nextPage = ref<string | null>(null);
-const previousPage = ref<string | null>(null);
 
 const fetchNextPage = async (): Promise<void> => {
   if (!nextPage.value) {
     return;
   }
-  isLoading.value = true;
+  isPageLoading.value = true;
   try {
-    const result: Result<Person> = await fetchAllPersons(nextPage.value);
-    starWarsPersons.value = result.results;
-    nextPage.value = result.next;
-    previousPage.value = result.previous;
+    const response: Result<Person> = await fetchAllPersons(nextPage.value);
+    store.dispatch("addtStarWarPersons", response.results as Array<Person>);
+    nextPage.value = response.next;
   } catch (error) {
     fetchingError.value = error as string;
     console.error(error);
   }
-  isLoading.value = false;
-};
-
-const fetchPreviousPage = async (): Promise<void> => {
-  if (!previousPage.value) {
-    return;
-  }
-  isLoading.value = true;
-  try {
-    const result: Result<Person> = await fetchAllPersons(previousPage.value);
-    starWarsPersons.value = result.results;
-    nextPage.value = result.next;
-    previousPage.value = result.previous;
-  } catch (error) {
-    fetchingError.value = error as string;
-    console.error(error);
-  }
-  isLoading.value = false;
+  isPageLoading.value = false;
 };
 
 // Searching person by name
