@@ -1,6 +1,6 @@
 <template>
   <div class="overflow-x-auto">
-    <table class="table">
+    <table class="table table-zebra">
       <thead>
         <tr>
           <th>Name</th>
@@ -12,47 +12,7 @@
       </thead>
       <tbody>
         <tr v-for="person in starWarsPersons" :key="person.name">
-          <td>
-            <div class="flex items-center gap-3">
-              <router-link
-                :to="{
-                  name: 'character',
-                  params: { id: getPersonId(person.url) },
-                }"
-                >{{ person.name }}</router-link
-              >
-            </div>
-          </td>
-          <td>
-            <div class="flex items-center gap-3">
-              {{ person.height }}
-            </div>
-          </td>
-          <td>
-            <div class="flex items-center gap-3">
-              {{ person.mass }}
-            </div>
-          </td>
-          <td>
-            <div class="flex items-center gap-3">
-              {{ person.hair_color }}
-            </div>
-          </td>
-          <th>
-            <button
-              v-if="!isFavourite"
-              class="btn btn-success btn-xs"
-              @click.stop="addPersonToFavourites(person)"
-            >
-              Add
-            </button>
-            <button
-              class="btn btn-error btn-xs"
-              @click.stop="deletePersonFromFavourites(person)"
-            >
-              Remove
-            </button>
-          </th>
+          <persons-table-row :person="person" />
         </tr>
       </tbody>
       <tfoot>
@@ -69,31 +29,14 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, computed } from "vue";
-import { useRoute } from "vue-router";
+import { defineProps } from "vue";
 import type { Person } from "@/types";
 
-import { getPersonId } from "@/helpers/parsing";
+import PersonsTableRow from "./PersonsTableRow.vue";
 
 defineProps<{
   starWarsPersons: Array<Person>;
 }>();
-
-import { useStore } from "vuex";
-const store = useStore();
-
-const route = useRoute();
-const isFavourite = computed(() => {
-  return route.name === "favourites";
-});
-
-const deletePersonFromFavourites = (person: Person) => {
-  store.dispatch("deletePersonFromFavourites", person);
-};
-
-const addPersonToFavourites = (person: Person) => {
-  store.dispatch("addPersonToFavourites", person);
-};
 </script>
 
 <style scoped>
