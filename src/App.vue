@@ -7,6 +7,16 @@
   <router-view />
 </template>
 
+<script setup lang="ts">
+import { onMounted } from "vue";
+import { getAllPersons } from "./composables";
+
+onMounted(async () => {
+  console.log("onMounted");
+  await getAllPersons();
+});
+</script>
+
 <style lang="scss">
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;

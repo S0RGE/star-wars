@@ -13,25 +13,39 @@
       <div v-for="person in starWarsPersons" :key="person.name">
         <span> {{ person.name }} </span> | <span> {{ person.height }} </span> |
         <span> {{ person.mass }} </span> |
-        <span> {{ person.hairColor }} </span> | <button>Delete</button>
-        <button>Tofavourites</button>
+        <span> {{ person.hairColor }} </span> |
+        <button @click="deletePersonFromFavourites(person)">Delete</button>
+        <button @click="addPersonToFavourites(person)">Tofavourites</button>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, watch, ref } from "vue";
-import { getAllPersons, searchPerson } from "@/api";
+import { computed, watch, ref } from "vue";
+import { searchPerson } from "@/api";
+
+import { useStore } from "vuex";
+const store = useStore();
 
 import type { Person } from "@/types";
 
-const starWarsPersons = ref<Array<Person>>([]);
+const starWarsPersons = computed(() => {
+  return store.getters.getStarWarPersons;
+});
 
 const search = ref<string>("");
 const searchPersonResult = ref<Array<Person>>([]);
 
 let debounceValue: number | undefined;
+
+const deletePersonFromFavourites = (person: Person) => {
+  store.dispatch("deletePersonFromFavourites", person);
+};
+
+const addPersonToFavourites = (person: Person) => {
+  store.dispatch("addPersonToFavourites", person);
+};
 
 watch(search, async () => {
   console.log(search.value);
@@ -44,10 +58,5 @@ watch(search, async () => {
     const findedPersons = await searchPerson(search.value);
     searchPersonResult.value = findedPersons;
   }, 500);
-});
-
-onMounted(async () => {
-  starWarsPersons.value = await getAllPersons();
-  console.log(starWarsPersons.value);
 });
 </script>
