@@ -19,7 +19,6 @@ interface ApiResult<T> {
 }
 
 interface FetchResult {
-  count: number;
   status: "success" | "error";
   message: string;
 }

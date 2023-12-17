@@ -56,7 +56,7 @@
       <button
         v-for="i in maxPage"
         :key="i"
-        @click="getStarWarPersons(i)"
+        @click="setCurrnetPage(i)"
         class="join-item btn"
         :class="{ 'btn-active': i === currentPage }"
       >
@@ -64,17 +64,10 @@
       </button>
     </div>
   </div>
-  <button
-    @click="scrollToTop"
-    v-if="showTopButton"
-    class="btn btn-active btn-accent top-button"
-  >
-    To top
-  </button>
 </template>
 
 <script lang="ts" setup>
-import { watch, ref, onMounted, computed, onUnmounted } from "vue";
+import { watch, ref, onMounted, computed } from "vue";
 import PersonsTable from "@/components/PersonsTable.vue";
 import { searchPerson } from "@/api";
 import { getPersonId } from "@/helpers/parsing";
@@ -87,23 +80,24 @@ const isLoading = ref<boolean>(false);
 const fetchingError = ref<string>("");
 
 const starWarsPersons = computed(() => {
-  return store.getters.getStarWarPersons;
+  return store.getters.getStarWarPersons[currentPage.value] || [];
 });
 
 const getStarWarPersons = async (page = 1): Promise<void> => {
+  if (starWarsPersons.value.length) {
+    return;
+  }
   isLoading.value = true;
   fetchingError.value = "";
   currentPage.value = page;
   const response: FetchResult = await store.dispatch("getStarWarPersons", page);
 
-  const { count, status, message } = response;
+  const { status, message } = response;
 
   if (status === "error") {
     fetchingError.value = message;
     return;
   }
-
-  allPersons.value = count;
 
   isLoading.value = false;
 };
@@ -116,9 +110,17 @@ const reloadHomePage = async () => {
 
 // Pagination
 const currentPage = ref<number>(1);
-const allPersons = ref<number>(0);
 const maxPage = computed(() => {
-  return Math.ceil(allPersons.value / 10);
+  const allPersons = store.state.personsCount;
+  return Math.ceil(allPersons / 10);
+});
+
+const setCurrnetPage = (page: number) => {
+  currentPage.value = page;
+};
+
+watch(currentPage, async () => {
+  await getStarWarPersons(currentPage.value);
 });
 
 // Searching person by name
@@ -144,26 +146,8 @@ watch(search, async () => {
   }, 500);
 });
 
-// Scroll to top
-const showTopButton = ref<boolean>(false);
-const handleScroll = () => {
-  showTopButton.value = window.scrollY > 400;
-};
-
-const scrollToTop = () => {
-  window.scrollTo({
-    top: 0,
-    behavior: "smooth",
-  });
-};
-
 onMounted(async () => {
   await getStarWarPersons();
-  window.addEventListener("scroll", handleScroll);
-});
-
-onUnmounted(() => {
-  window.removeEventListener("scroll", handleScroll);
 });
 </script>
 
@@ -204,10 +188,5 @@ onUnmounted(() => {
     @apply mt-4;
     text-align: center;
   }
-}
-.top-button {
-  position: fixed;
-  right: 1em;
-  bottom: 1em;
 }
 </style>
