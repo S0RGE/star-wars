@@ -8,7 +8,6 @@ export default createStore({
     return {
       starWarPersons: [] as Array<Person>,
       favourites: [] as Array<Person>,
-      next: null as string | null,
     };
   },
   getters: {
@@ -45,9 +44,6 @@ export default createStore({
     setFavourites(state, payload: Array<Person>) {
       state.favourites = payload;
     },
-    setNextPage(state, payload: string) {
-      state.next = payload;
-    },
   },
   actions: {
     addPersonToFavourites({ commit }, person: Person) {
@@ -63,7 +59,6 @@ export default createStore({
       try {
         const response: ApiResult<Person> = await fetchAllPersons(page);
         commit("addStarWarPersons", response.results as Array<Person>);
-        commit("setNextPage", response.next as string);
         return {
           status: "success",
           count: response.count,
