@@ -14,7 +14,8 @@
             <span>
               Height:
               <span class="person-page__info">
-                {{ currentPerson?.height }}cm
+                {{ currentPerson?.height }}
+                <span v-if="currentPerson?.height !== 'unknown'"> cm </span>
               </span>
             </span>
           </div>
@@ -22,7 +23,8 @@
             <span>
               Mass:
               <span class="person-page__info"
-                >{{ currentPerson?.mass }}kg
+                >{{ currentPerson?.mass }}
+                <span v-if="currentPerson?.mass !== 'unknown'"> kg </span>
               </span></span
             >
           </div>
