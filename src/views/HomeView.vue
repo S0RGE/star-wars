@@ -99,7 +99,7 @@ const getAllPersons = async (): Promise<void> => {
   try {
     const response: Result<Person> = await fetchAllPersons();
     store.dispatch("addStarWarPersons", response.results as Array<Person>);
-    nextPage.value = response.next;
+    store.dispatch("saveNextPage", response.next as string);
   } catch (error) {
     fetchingError.value = error as string;
     console.error(error);
@@ -108,7 +108,9 @@ const getAllPersons = async (): Promise<void> => {
 };
 
 // Pagination
-const nextPage = ref<string | null>(null);
+const nextPage = computed(() => {
+  return store.state.next;
+});
 
 const fetchNextPage = async (): Promise<void> => {
   if (!nextPage.value) {
@@ -118,7 +120,7 @@ const fetchNextPage = async (): Promise<void> => {
   try {
     const response: Result<Person> = await fetchAllPersons(nextPage.value);
     store.dispatch("addStarWarPersons", response.results as Array<Person>);
-    nextPage.value = response.next;
+    store.dispatch("saveNextPage", response.next as string);
   } catch (error) {
     fetchingError.value = error as string;
     console.error(error);

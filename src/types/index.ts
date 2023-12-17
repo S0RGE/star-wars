@@ -8,6 +8,7 @@ type Person = {
   birth_year: string;
   gender: string;
   url: string;
+  next: string | null;
 };
 
 type Result<T> = {

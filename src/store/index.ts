@@ -7,6 +7,7 @@ export default createStore({
     return {
       starWarPersons: [] as Array<Person>,
       favourites: [] as Array<Person>,
+      next: null as string | null,
     };
   },
   getters: {
@@ -43,6 +44,9 @@ export default createStore({
     setFavourites(state, payload: Array<Person>) {
       state.favourites = payload;
     },
+    setNextPage(state, payload: string) {
+      state.next = payload;
+    },
   },
   actions: {
     addStarWarPersons({ commit }, persons: Array<Person>) {
@@ -56,6 +60,9 @@ export default createStore({
     },
     setFavourites({ commit }, favourites: Array<Person>) {
       commit("setFavourites", favourites);
+    },
+    saveNextPage({ commit }, url: string) {
+      commit("setNextPage", url);
     },
   },
   modules: {},
