@@ -2,9 +2,10 @@ const API_URL = "https://swapi.dev/api";
 
 import { Person } from "../types/index";
 
-const fetchAllPersons = async <T>(url?: string): Promise<T> => {
+const fetchAllPersons = async <T>(page: number): Promise<T> => {
+  const searchParams = new URLSearchParams({ page: page.toString() });
   try {
-    const fetchUrl = url || `${API_URL}/people`;
+    const fetchUrl = `${API_URL}/people?${searchParams.toString()}`;
     const response: Response = await fetch(fetchUrl);
     const data = await response.json();
     return data;

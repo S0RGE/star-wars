@@ -1,4 +1,4 @@
-type Person = {
+interface Person {
   name: string;
   height: string;
   mass: string;
@@ -9,12 +9,19 @@ type Person = {
   gender: string;
   url: string;
   next: string | null;
-};
+}
 
-type Result<T> = {
+interface ApiResult<T> {
   results: T[];
   next: string | null;
   previous: string | null;
-};
+  count: number;
+}
 
-export type { Person, Result };
+interface FetchResult {
+  count: number;
+  status: "success" | "error";
+  message: string;
+}
+
+export type { Person, ApiResult, FetchResult };

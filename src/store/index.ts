@@ -1,6 +1,7 @@
 import { createStore } from "vuex";
+import type { Person, ApiResult, FetchResult } from "@/types";
 
-import type { Person } from "@/types";
+import { fetchAllPersons } from "@/api";
 
 export default createStore({
   state: () => {
@@ -25,7 +26,7 @@ export default createStore({
   },
   mutations: {
     addStarWarPersons(state, payload: Array<Person>) {
-      state.starWarPersons = [...state.starWarPersons, ...payload];
+      state.starWarPersons = payload;
     },
     addPersonToFavourites(state, payload: Person) {
       localStorage.setItem(
@@ -49,9 +50,6 @@ export default createStore({
     },
   },
   actions: {
-    addStarWarPersons({ commit }, persons: Array<Person>) {
-      commit("addStarWarPersons", persons);
-    },
     addPersonToFavourites({ commit }, person: Person) {
       commit("addPersonToFavourites", person);
     },
@@ -61,8 +59,24 @@ export default createStore({
     setFavourites({ commit }, favourites: Array<Person>) {
       commit("setFavourites", favourites);
     },
-    saveNextPage({ commit }, url: string) {
-      commit("setNextPage", url);
+    async getStarWarPersons({ commit }, page: number): Promise<FetchResult> {
+      try {
+        const response: ApiResult<Person> = await fetchAllPersons(page);
+        commit("addStarWarPersons", response.results as Array<Person>);
+        commit("setNextPage", response.next as string);
+        console.log("Test: ", response);
+        return {
+          status: "success",
+          count: response.count,
+          message: "Success",
+        };
+      } catch (error) {
+        return {
+          status: "error",
+          count: 0,
+          message: (error as Error).message,
+        };
+      }
     },
   },
   modules: {},
