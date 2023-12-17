@@ -1,6 +1,6 @@
 const API_URL = "https://swapi.dev/api";
 
-import { Person } from "../types/index";
+import { Person, Film } from "../types/index";
 
 const fetchAllPersons = async <T>(page: number): Promise<T> => {
   const searchParams = new URLSearchParams({ page: page.toString() });
@@ -37,4 +37,14 @@ const searchPerson = async (name: string): Promise<Array<Person>> => {
   }
 };
 
-export { fetchAllPersons, searchPerson, fetchPerson };
+const getFilmById = async (url: string): Promise<Film> => {
+  try {
+    const response = await fetch(url);
+    const film = await response.json();
+    return film;
+  } catch (error) {
+    throw new Error("Failed to fetch films.");
+  }
+};
+
+export { fetchAllPersons, searchPerson, fetchPerson, getFilmById };
