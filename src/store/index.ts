@@ -64,7 +64,6 @@ export default createStore({
         const response: ApiResult<Person> = await fetchAllPersons(page);
         commit("addStarWarPersons", response.results as Array<Person>);
         commit("setNextPage", response.next as string);
-        console.log("Test: ", response);
         return {
           status: "success",
           count: response.count,

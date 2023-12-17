@@ -25,8 +25,11 @@ const fetchPerson = async (id: string): Promise<Person> => {
 };
 
 const searchPerson = async (name: string): Promise<Array<Person>> => {
+  const searchParams = new URLSearchParams({ search: name });
   try {
-    const response = await fetch(`${API_URL}/people/?search=${name}`);
+    const response = await fetch(
+      `${API_URL}/people/?${searchParams.toString()}`
+    );
     const data: { results: Array<Person> } = await response.json();
     return data.results;
   } catch (error) {
